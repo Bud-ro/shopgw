@@ -1,0 +1,19 @@
+Shopgoodwill scraper
+
+- Flask app
+- Use config file internally for selecting keywords and modes
+- Use Apprise to notify users, I plan on using sendgrid
+- Store data in two csv files, one for history of all scraped pages
+  and another for the current batch that will be used to notify users
+  ( Long term: use SQLite or NoSQL database, possibly Oracle's options)
+
+- Data format:
+        ID, title, expiration timestamp
+
+- Actually put a python init file in for once
+- Dockerize this (conflicts with using Oracle DB)
+
+---
+After MVP:
+Add support for multiple profiles with different notifiers
+Add more modes and config options (price compare mode, notify only when one day left on auction, etc.)
