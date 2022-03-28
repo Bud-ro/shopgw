@@ -1,17 +1,43 @@
 Shopgoodwill scraper
+Description:
 
-- Flask app
+We will use SQLite provided by flask in the `g` object. This will store multiple things.
+
+Starting from a set ID (look first in the DB then in the program), get each listing page from shopgoodwill.com.
+If the listing is expired for some reason then assume that the current listing is far in the past.
+Increment the ID by 100,000 until the listing is active.
+If we overshoot to an invalid listing then binary search until we reach the oldest active listing in the subrange.
+
+Once we have a starting index then we will switch to normal operating mode. This operates as follows:
+Thread 1:
+Every `x +/- y` seconds grab the next page. If it exists AND matches filters then log this into the DB with its: 
+	Name, ID, first_image_URL, current price, Expiration Timestamp, notification status
+	Filter operation:
+		User defined as according to 
+Thread 2:
+Every 1-8 hrs, from unnotified listings choose which to notify about according to filters
+	(Is 1/2/3 days away from ending; notify all; lots of options to choose)
+Send a notification using apprise with the name and link for each listing in the format:
+	Hello <User>, here is your shopgoodwill digest. There are <X> new listings that match your filters:
+	-----------------------------------------------
+	For listing in listings:
+		listing.Title<With hyperlink to listing>:
+		list.price
+		listing.ExpirationTimestamp
+		embded listing.first_image_URL
+
+After notification issued, then for each ID:
+	- Match row in DB
+	- Change notification status from False to True
+	
+✅ Flask app
+✅ Use Apprise to notify users, I plan on using sendgrid
 - Use config file internally for selecting keywords and modes
-- Use Apprise to notify users, I plan on using sendgrid
-- Store data in two csv files, one for history of all scraped pages
-  and another for the current batch that will be used to notify users
-  ( Long term: use SQLite or NoSQL database, possibly Oracle's options)
-
-- Data format:
-        ID, title, expiration timestamp
+- Store data in SQLite database, store each row as:
+	Item name, ID (in URL), Expiration Date/Timestamp, has been notified
 
 - Actually put a python init file in for once
-- Dockerize this (conflicts with using Oracle DB)
+- Dockerize this
 
 ---
 After MVP:
