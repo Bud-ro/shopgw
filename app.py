@@ -14,7 +14,7 @@ filter_list = ["record", "vinyl", "LP", "cassette", "beta", "laser disk"]
 # Load .env
 DISCORD_WEBHOOK_LINK = environ.get("DISCORD_WEBHOOK_LINK")
 DATABASE = "listings.sqlite" # Located in local directory
-# db = Store(DATABASE)
+db = Store(DATABASE)
 
 app = Flask(__name__)
 apobj = apprise.Apprise()
