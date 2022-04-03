@@ -9,7 +9,8 @@ class Store:
     Class for managing the listings database
     """
 
-    NON_KEYS = "TITLE, PRICE, END_TIMESTAMP, IMAGE_URL, NOTIFIED"
+    NON_KEYS = "TITLE, DESCRIPTION, PRICE, END_TIMESTAMP, IMAGE_URL, NOTIFIED"
+    LISTING_SIZE = 1 + len(NON_KEYS.split(", "))
 
     def __init__(self, dbfile: str) -> None:
         self.dbfile = dbfile
@@ -23,6 +24,7 @@ class Store:
                 "CREATE TABLE IF NOT EXISTS LISTING"
                 "(ID INTEGER PRIMARY KEY,"
                 " TITLE TEXT,"
+                " DESCRIPTION TEXT,"
                 " PRICE INTEGER,"
                 " END_TIMESTAMP INTEGER,"
                 " IMAGE_URL TEXT,"
@@ -43,9 +45,7 @@ class Store:
                 return False
 
             # If it doesn't then insert it
-            query = (
-                f"INSERT INTO LISTING (ID, {self.NON_KEYS}) VALUES (?, ?, ?, ?, ?, ?)"
-            )
+            query = f"INSERT INTO LISTING (ID, {self.NON_KEYS}) VALUES ({'?, '*(self.LISTING_SIZE - 1)}?)"
             cursor.execute(query, (*listing,))
             connection.commit()
             self.last_key = cursor.lastrowid
@@ -61,10 +61,7 @@ class Store:
     def update_listing(self, listing: Listing) -> None:
         with sqlite3.connect(self.dbfile) as connection:
             cursor = connection.cursor()
-            query = (
-                "UPDATE LISTING SET TITLE = ?, PRICE = ?, END_TIMESTAMP = ?,"
-                " IMAGE_URL = ?, NOTIFIED = ? WHERE (ID = ?)"
-            )
+            query = f"UPDATE LISTING SET {' = ?, '.join(self.NON_KEYS.split(', '))} = ? WHERE (ID = ?)"
             (_, *non_keys) = listing  # Tuple unpacking to exclude first (ID)
             cursor.execute(query, (*non_keys, listing.ID))
             connection.commit()
@@ -85,11 +82,12 @@ class Store:
             cursor = connection.cursor()
             query = f"SELECT ID, {self.NON_KEYS} FROM LISTING ORDER BY ID"
             cursor.execute(query)
-            listings = [
-                Listing(ID, title, price, end_timestamp, image_url, notified)
-                for ID, title, price, end_timestamp, image_url, notified in cursor
-            ]
+            listings = [Listing(*listing) for listing in cursor]
         return listings
+
+    def get_most_recent_listing(self) -> Listing:
+        listings = self.get_listings()
+        return listings[-1]
 
 
 def db_test() -> None:
@@ -101,17 +99,23 @@ def db_test() -> None:
     my_store.create_table()
 
     test_listing = Listing(
-        104, "Test Title 4", 1337, 13123123, "https://testimage.url", True
+        106,
+        "Test Title 6",
+        "Test Description 2",
+        2,
+        3,
+        "https://testimage.url",
+        True,
     )
-    print("Adding Test Listing: {test_listing}")
+    print(f"Adding Test Listing: {test_listing}")
 
-    # Update listing
+    # Test update_listing
     # my_store.update_listing(test_listing)
     # Add Listing
-    # if my_store.add_listing(test_listing):
-    #     print("Added row")
-    # else:
-    #     print("Failed to add row")
+    if my_store.add_listing(test_listing):
+        print("Added row")
+    else:
+        print("Failed to add row")
     print("Retrieving all listings:")
     print(my_store.get_listings())
 

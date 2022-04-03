@@ -6,6 +6,7 @@ class Listing:
         self,
         ID: Union[int, str],
         title: str,
+        description: str,
         price: Union[float, str],
         end_timestamp: Union[int, str],
         image_url: str,
@@ -13,6 +14,7 @@ class Listing:
     ) -> None:
         self.ID = int(ID)
         self.title = title
+        self.description = description
         self.price = float(price)
         self.end_timestamp = int(end_timestamp)
         self.image_url = image_url
@@ -24,12 +26,14 @@ class Listing:
         elif index == 1:
             return self.title
         elif index == 2:
-            return self.price
+            return self.description
         elif index == 3:
-            return self.end_timestamp
+            return self.price
         elif index == 4:
-            return self.image_url
+            return self.end_timestamp
         elif index == 5:
+            return self.image_url
+        elif index == 6:
             return self.notified
         else:
             # If index is outside of these options then:
@@ -37,11 +41,16 @@ class Listing:
 
     def __repr__(self) -> str:
         # Iterates over self and returns it in a tuple format
-        return "Listing: " + str(tuple(self))
+        return (
+            f"Listing: ({self.ID}, {self.title}, {self.description[0:40]}...,"
+            " {self.price}, {self.end_timestamp}, {self.image_url}, {self.notified})"
+        )
 
 
 def testListing():
-    listing = Listing(12321, "Test Listing", 120.1, 1648933576, "test url", False)
+    listing = Listing(
+        12321, "Test Listing", "Test Description", 120.1, 1648933576, "test url", False
+    )
     print(listing)
 
 
