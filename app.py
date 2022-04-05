@@ -1,5 +1,4 @@
 from flask import Flask
-from flask import escape
 import apprise
 from os import environ
 from store import Store

@@ -1,8 +1,6 @@
 Shopgoodwill scraper
 Description:
 
-We will use SQLite provided by flask in the `g` object. This will store multiple things.
-
 Starting from a set ID (look first in the DB then in the program), get each listing page from shopgoodwill.com.
 If the listing is expired for some reason then assume that the current listing is far in the past.
 Increment the ID by 100,000 until the listing is active.
