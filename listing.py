@@ -43,16 +43,27 @@ class Listing:
         # Iterates over self and returns it in a tuple format
         return (
             f"Listing: ({self.ID}, {self.title}, {self.description[0:40]}...,"
-            " {self.price}, {self.end_timestamp}, {self.image_url}, {self.notified})"
+            f" {self.price}, {self.end_timestamp}, {self.image_url}, {self.notified})"
         )
 
 
-def testListing():
+def test_listing():
     listing = Listing(
         12321, "Test Listing", "Test Description", 120.1, 1648933576, "test url", False
     )
+
+    # Test tuple unpacking
+    assert (
+        12321,
+        "Test Listing",
+        "Test Description",
+        120.1,
+        1648933576,
+        "test url",
+        False,
+    ) == (*listing,), "Should be equal"
     print(listing)
 
 
 if __name__ == "__main__":
-    testListing()
+    test_listing()
